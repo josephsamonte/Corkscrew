@@ -88,7 +88,7 @@ export function MessageComposer({ jobId, recipientId }: MessageComposerProps) {
       </div>
       <button
         type="submit"
-        className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
+        className="btn-accent rounded-full px-4 py-2 text-sm font-medium disabled:cursor-not-allowed"
         disabled={isSubmitting || !recipientId}
       >
         {isSubmitting ? "Sending..." : "Send"}

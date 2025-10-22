@@ -10,14 +10,26 @@ import type { Database } from "@/types/database";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export const getServerSupabaseClient = () =>
-  createServerComponentClient<Database>({ cookies });
+export const getServerSupabaseClient = async () => {
+  const cookieStore = await cookies();
+  return createServerComponentClient<Database>({
+    cookies: () => cookieStore,
+  });
+};
 
-export const getRouteHandlerSupabaseClient =
-  () => createRouteHandlerClient<Database>({ cookies });
+export const getRouteHandlerSupabaseClient = async () => {
+  const cookieStore = await cookies();
+  return createRouteHandlerClient<Database>({
+    cookies: () => cookieStore,
+  });
+};
 
-export const getServerActionSupabaseClient = () =>
-  createServerActionClient<Database>({ cookies });
+export const getServerActionSupabaseClient = async () => {
+  const cookieStore = await cookies();
+  return createServerActionClient<Database>({
+    cookies: () => cookieStore,
+  });
+};
 
 export const getMiddlewareSupabaseClient = (params: {
   req: NextRequest;

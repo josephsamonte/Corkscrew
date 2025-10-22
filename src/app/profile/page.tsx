@@ -1,15 +1,14 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { ProfileForm } from "@/components/forms/profile-form";
-import type { Database, Profile } from "@/types/database";
+import type { Profile } from "@/types/database";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 
 export default async function ProfilePage() {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     redirect("/setup");
   }
 
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = await getServerSupabaseClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();

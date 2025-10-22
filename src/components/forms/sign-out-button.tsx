@@ -21,7 +21,7 @@ export function SignOutButton() {
     <button
       type="button"
       onClick={handleClick}
-      className="rounded-full border border-zinc-200 px-3 py-1 text-sm font-medium text-zinc-700 hover:border-zinc-300 hover:text-zinc-900 disabled:cursor-not-allowed disabled:bg-zinc-100"
+      className="rounded-full border border-zinc-200 px-3 py-1 text-sm font-medium text-zinc-700 transition hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:bg-zinc-100"
       disabled={pending}
     >
       {pending ? "Signing out..." : "Sign out"}

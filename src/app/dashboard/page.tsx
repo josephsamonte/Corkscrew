@@ -1,8 +1,8 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import Link from "next/link";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Job, JobApplication, Profile } from "@/types/database";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 
 type DashboardData = {
   profile: Profile;
@@ -10,8 +10,10 @@ type DashboardData = {
   applications: JobApplication[];
 };
 
-async function loadDashboardData(userId: string): Promise<DashboardData> {
-  const supabase = createServerComponentClient<Database>({ cookies });
+async function loadDashboardData(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+): Promise<DashboardData> {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
@@ -70,7 +72,7 @@ export default async function DashboardPage() {
     redirect("/setup");
   }
 
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = await getServerSupabaseClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -79,7 +81,7 @@ export default async function DashboardPage() {
     redirect("/auth/sign-in");
   }
 
-  const data = await loadDashboardData(session.user.id);
+  const data = await loadDashboardData(supabase, session.user.id);
 
   return (
     <div className="space-y-10">
@@ -145,10 +147,7 @@ function HireDashboard({
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-zinc-900">Recent job posts</h2>
-          <Link
-            href="/jobs/new"
-            className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-          >
+          <Link href="/jobs/new" className="btn-accent rounded-full px-4 py-2 text-sm font-medium">
             Create job
           </Link>
         </div>

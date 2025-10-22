@@ -1,10 +1,9 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import Link from "next/link";
 import clsx from "clsx";
 import { MessageComposer } from "@/components/forms/message-composer";
-import type { Database, Message } from "@/types/database";
+import type { Message } from "@/types/database";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 
 type Conversation = {
   job: {
@@ -18,7 +17,7 @@ type Conversation = {
 };
 
 async function fetchConversations(userId: string): Promise<Conversation[]> {
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = await getServerSupabaseClient();
 
   const { data: messages } = await supabase
     .from("messages")
@@ -64,7 +63,7 @@ export default async function MessagesPage({
     redirect("/setup");
   }
 
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = await getServerSupabaseClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -85,7 +84,7 @@ export default async function MessagesPage({
         </p>
         <Link
           href="/jobs"
-          className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          className="btn-accent inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium"
         >
           Browse jobs
         </Link>
@@ -132,8 +131,8 @@ export default async function MessagesPage({
               className={clsx(
                 "flex flex-col gap-1 rounded-2xl border px-4 py-3 transition",
                 conversation.job.id === activeConversation.job.id
-                  ? "border-zinc-900 bg-zinc-900 text-white"
-                  : "border-zinc-200 hover:border-zinc-300 hover:text-zinc-900",
+                  ? "border-accent bg-[color:var(--accent)] text-white"
+                  : "border-zinc-200 hover:border-accent hover:text-accent",
               )}
             >
               <span className="text-sm font-semibold">
@@ -165,7 +164,7 @@ export default async function MessagesPage({
               className={clsx(
                 "flex flex-col gap-1 rounded-2xl px-4 py-3 text-sm",
                 message.sender_id === viewerId
-                  ? "self-end bg-zinc-900 text-white"
+                  ? "self-end bg-[color:var(--accent)] text-white"
                   : "self-start border border-zinc-200 bg-zinc-50 text-zinc-700",
               )}
             >

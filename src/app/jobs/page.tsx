@@ -1,10 +1,9 @@
-import { cookies } from "next/headers";
 import Link from "next/link";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import type { Database, Job, Profile } from "@/types/database";
+import type { Job, Profile } from "@/types/database";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 
 type JobsPageProps = {
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 async function fetchJobs({
@@ -22,7 +21,7 @@ async function fetchJobs({
     return [];
   }
 
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = await getServerSupabaseClient();
   let request = supabase
     .from("jobs")
     .select("*")
@@ -58,7 +57,7 @@ async function fetchProfile(): Promise<Profile | null> {
     return null;
   }
 
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = await getServerSupabaseClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -76,11 +75,12 @@ async function fetchProfile(): Promise<Profile | null> {
 }
 
 export default async function JobsPage({ searchParams }: JobsPageProps) {
-  const query = typeof searchParams.q === "string" ? searchParams.q : undefined;
+  const params = await searchParams;
+  const query = typeof params.q === "string" ? params.q : undefined;
   const location =
-    typeof searchParams.location === "string" ? searchParams.location : undefined;
-  const role = typeof searchParams.role === "string" ? searchParams.role : undefined;
-  const date = typeof searchParams.date === "string" ? searchParams.date : undefined;
+    typeof params.location === "string" ? params.location : undefined;
+  const role = typeof params.role === "string" ? params.role : undefined;
+  const date = typeof params.date === "string" ? params.date : undefined;
 
   const [jobs, profile] = await Promise.all([
     fetchJobs({ query, location, role, date }),
@@ -102,10 +102,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
             <h1 className="text-3xl font-semibold text-zinc-900">Find your next event gig</h1>
           </div>
           {profile?.role === "hire" ? (
-            <Link
-              href="/jobs/new"
-              className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-            >
+            <Link href="/jobs/new" className="btn-accent rounded-full px-4 py-2 text-sm font-medium">
               Post a job
             </Link>
           ) : null}
@@ -167,10 +164,7 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
           >
             Reset
           </Link>
-          <button
-            type="submit"
-            className="rounded-full bg-zinc-900 px-5 py-2 font-medium text-white hover:bg-zinc-800"
-          >
+          <button type="submit" className="btn-accent rounded-full px-5 py-2 font-medium">
             Apply filters
           </button>
         </div>

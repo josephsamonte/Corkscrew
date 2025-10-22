@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
-import { cookies } from "next/headers";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { Session } from "@supabase/supabase-js";
 import { SignOutButton } from "@/components/forms/sign-out-button";
 import { SupabaseProvider } from "@/components/providers/supabase-provider";
 import { SupabaseListener } from "@/components/listeners/supabase-listener";
-import type { Database } from "@/types/database";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,7 +30,7 @@ async function getInitialSession(): Promise<Session | null> {
     return null;
   }
 
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = await getServerSupabaseClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -41,9 +40,16 @@ async function getInitialSession(): Promise<Session | null> {
 function Nav({ session }: { session: Session | null }) {
   const isAuthenticated = Boolean(session);
   return (
-    <header className="border-b border-zinc-200 bg-white">
+    <header className="border-b border-zinc-200 bg-[color:var(--background)]">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="text-xl font-semibold text-zinc-900">
+        <Link href="/" className="flex items-center gap-2 text-xl font-semibold text-accent">
+          <Image
+            src="/logo.svg"
+            alt="Corkscrew logo"
+            width={30}
+            height={30}
+            priority
+          />
           Corkscrew
         </Link>
         <div className="flex items-center gap-4 text-sm font-medium text-zinc-700">
@@ -60,7 +66,7 @@ function Nav({ session }: { session: Session | null }) {
               </Link>
               <Link
                 href="/profile"
-                className="rounded-full border border-zinc-200 px-3 py-1 hover:border-zinc-300 hover:text-zinc-900"
+                className="rounded-full border border-zinc-200 px-3 py-1 text-zinc-700 hover:border-accent hover:text-accent"
               >
                 Profile
               </Link>
@@ -73,7 +79,7 @@ function Nav({ session }: { session: Session | null }) {
               </Link>
               <Link
                 href="/auth/sign-up"
-                className="rounded-full bg-zinc-900 px-4 py-1.5 text-white hover:bg-zinc-800"
+                className="btn-accent rounded-full px-4 py-1.5"
               >
                 Join now
               </Link>

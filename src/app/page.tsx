@@ -1,14 +1,13 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import type { Database, Job } from "@/types/database";
+import type { Job } from "@/types/database";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 
 async function getFeaturedJobs(): Promise<Job[]> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return [];
   }
 
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = await getServerSupabaseClient();
   const { data, error } = await supabase
     .from("jobs")
     .select("*")
@@ -40,10 +39,7 @@ export default async function Home() {
             Corkscrew connects event organizers with verified service professionals. Publish a job, browse available talent, and handle the entire booking flow in one place.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link
-              href="/auth/sign-up"
-              className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
-            >
+            <Link href="/auth/sign-up" className="btn-accent rounded-full px-6 py-3 text-sm font-medium shadow-sm transition">
               Get started
             </Link>
             <Link
@@ -126,7 +122,7 @@ export default async function Home() {
                 </dl>
                 <Link
                   href={`/jobs/${job.id}`}
-                  className="mt-6 inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                  className="mt-6 inline-flex items-center justify-center btn-accent rounded-full px-4 py-2 text-sm font-medium"
                 >
                   View details
                 </Link>

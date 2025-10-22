@@ -4,7 +4,10 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import type { Database } from "@/types/database";
 
 export async function POST(request: Request) {
-  const supabase = createRouteHandlerClient<Database>({ cookies });
+  const cookieStore = await cookies();
+  const supabase = createRouteHandlerClient<Database>({
+    cookies: () => cookieStore,
+  });
   const { event, session } = await request.json();
 
   if (event === "SIGNED_IN" && session) {

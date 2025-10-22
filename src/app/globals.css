@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8eee4;
+  --foreground: #231915;
+  --accent: #7c261d;
+  --accent-strong: #5d1c15;
+  --accent-foreground: #fff8f0;
 }
 
 @theme inline {
@@ -20,7 +23,31 @@
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.btn-accent {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+  transition: background-color 0.2s ease, filter 0.2s ease;
+}
+
+.btn-accent:hover,
+.btn-accent:focus-visible {
+  background-color: var(--accent-strong);
+}
+
+.btn-accent:disabled {
+  background-color: color-mix(in srgb, var(--accent) 60%, #e0d0c8);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.border-accent {
+  border-color: var(--accent);
 }

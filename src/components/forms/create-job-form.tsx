@@ -195,7 +195,7 @@ export function CreateJobForm() {
         </button>
         <button
           type="submit"
-          className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
+          className="btn-accent rounded-full px-5 py-2 text-sm font-medium disabled:cursor-not-allowed"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Publishing..." : "Publish job"}

@@ -1,15 +1,13 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { CreateJobForm } from "@/components/forms/create-job-form";
-import type { Database } from "@/types/database";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 
 export default async function NewJobPage() {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     redirect("/setup");
   }
 
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = await getServerSupabaseClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();

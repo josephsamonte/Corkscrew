@@ -1,9 +1,8 @@
-import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import Link from "next/link";
 import { ApplyToJobForm } from "@/components/forms/apply-to-job-form";
-import type { Database, Job, JobApplication, Profile } from "@/types/database";
+import type { Job, JobApplication, Profile } from "@/types/database";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 
 type JobPageProps = {
   params: { id: string };
@@ -21,7 +20,7 @@ async function loadJobDetail(jobId: string): Promise<JobDetail> {
     throw new Error("Supabase is not configured");
   }
 
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = await getServerSupabaseClient();
 
   const {
     data: { session },
@@ -192,7 +191,7 @@ export default async function JobDetailPage({ params }: JobPageProps) {
             )}
             <Link
               href={detail.viewerProfile ? "/messages" : "/auth/sign-in"}
-              className="mt-4 inline-flex rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+              className="btn-accent mt-4 inline-flex rounded-full px-4 py-2 text-sm font-medium"
             >
               {detail.viewerProfile ? "Go to messages" : "Sign in"}
             </Link>
