@@ -1,65 +1,144 @@
-import Image from "next/image";
+import Link from "next/link";
+import { cookies } from "next/headers";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import type { Database, Job } from "@/types/database";
 
-export default function Home() {
+async function getFeaturedJobs(): Promise<Job[]> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return [];
+  }
+
+  const supabase = createServerComponentClient<Database>({ cookies });
+  const { data, error } = await supabase
+    .from("jobs")
+    .select("*")
+    .eq("status", "open")
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data;
+}
+
+export default async function Home() {
+  const jobs = await getFeaturedJobs();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex flex-col gap-16">
+      <section className="grid gap-10 rounded-3xl bg-white px-10 py-16 shadow-sm sm:grid-cols-2">
+        <div className="space-y-6">
+          <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-zinc-600">
+            Hospitality staffing made simple
+          </span>
+          <h1 className="text-4xl font-semibold leading-tight text-zinc-900">
+            Book vetted bartenders, servers, and caterers for any event in minutes.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg text-zinc-600">
+            Corkscrew connects event organizers with verified service professionals. Publish a job, browse available talent, and handle the entire booking flow in one place.
           </p>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/auth/sign-up"
+              className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
+            >
+              Get started
+            </Link>
+            <Link
+              href="/jobs"
+              className="rounded-full border border-zinc-200 px-6 py-3 text-sm font-medium text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900"
+            >
+              Explore open roles
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="space-y-6 rounded-2xl border border-zinc-100 bg-zinc-50 p-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Why teams choose Corkscrew
+          </h2>
+          <ul className="grid gap-5 text-sm text-zinc-600">
+            <li>
+              <strong className="block text-zinc-900">Curated professionals</strong>
+              Identity verification, background checks, and community reviews build trust before your event begins.
+            </li>
+            <li>
+              <strong className="block text-zinc-900">Flexible booking</strong>
+              Fine-tune availability, hourly rates, and special requirements to craft the perfect event crew.
+            </li>
+            <li>
+              <strong className="block text-zinc-900">Messaging & logistics</strong>
+              Coordinate details, confirm call times, and gather post-event feedback without leaving the platform.
+            </li>
+          </ul>
         </div>
-      </main>
+      </section>
+
+      <section className="space-y-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-semibold text-zinc-900">
+            Featured opportunities
+          </h2>
+          <Link
+            href="/jobs"
+            className="text-sm font-medium text-zinc-600 underline decoration-zinc-300 underline-offset-4 hover:text-zinc-900"
+          >
+            View all jobs
+          </Link>
+        </div>
+        {jobs.length ? (
+          <div className="grid gap-6 md:grid-cols-3">
+            {jobs.map((job) => (
+              <article
+                key={job.id}
+                className="flex h-full flex-col justify-between rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-zinc-900">
+                    {job.title}
+                  </h3>
+                  <p className="text-sm text-zinc-600 line-clamp-3">
+                    {job.description}
+                  </p>
+                </div>
+                <dl className="mt-6 grid grid-cols-2 gap-2 text-xs text-zinc-500">
+                  <div>
+                    <dt className="uppercase tracking-wide">Date</dt>
+                    <dd className="font-medium text-zinc-800">
+                      {new Date(job.event_date).toLocaleDateString()}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="uppercase tracking-wide">Rate</dt>
+                    <dd className="font-medium text-zinc-800">
+                      {job.rate ? `$${job.rate.toFixed(0)}/hr` : "Negotiable"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="uppercase tracking-wide">Location</dt>
+                    <dd className="font-medium text-zinc-800">{job.location}</dd>
+                  </div>
+                  <div>
+                    <dt className="uppercase tracking-wide">Status</dt>
+                    <dd className="font-medium capitalize text-emerald-600">{job.status}</dd>
+                  </div>
+                </dl>
+                <Link
+                  href={`/jobs/${job.id}`}
+                  className="mt-6 inline-flex items-center justify-center rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+                >
+                  View details
+                </Link>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-100 p-8 text-center text-sm text-zinc-600">
+            No jobs yet. Once your Supabase project is connected, recent openings will appear here automatically.
+          </div>
+        )}
+      </section>
     </div>
   );
 }

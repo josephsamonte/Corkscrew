@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Corkscrew Web MVP
 
-## Getting Started
+A Next.js App Router project that powers the Corkscrew marketplace for connecting event organizers with hospitality professionals. The MVP covers authentication, profile management, job postings, applications, lightweight messaging, and review scaffolding backed by Supabase.
 
-First, run the development server:
+## Tech Stack
+
+- [Next.js 16](https://nextjs.org) with the App Router
+- [Supabase](https://supabase.com) for auth and PostgreSQL data
+- Tailwind CSS (v4 preview) for styling
+- React Hook Form + Zod for validated forms
+
+## Local Development
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Provide Supabase credentials by copying the example env and filling in your project details:
+   ```bash
+   cp .env.local.example .env.local
+   # edit .env.local with NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+   ```
+
+3. Apply the database schema inside your Supabase project:
+   ```sql
+   -- supabase/sql editor or CLI
+   \i supabase/schema.sql
+   ```
+
+4. Start the dev server:
+   ```bash
+   npm run dev
+   ```
+
+5. Visit `http://localhost:3000` to use the app. Protected routes (dashboard, jobs, messages, profile) require a signed-in user.
+
+## Feature Overview
+
+- **Landing & Marketplace**: Home page marketing content with featured job listings, filters for browsing `/jobs`, and detailed job pages with application flows.
+- **Authentication**: Email/password sign-up and sign-in, role selection (“Hire” or “Work”), session management via Supabase helpers, and a global sign-out button.
+- **Profiles**: Editable profile with bio, skills, certifications, rates, and availability placeholders. Profiles seed automatically on sign-up.
+- **Job Management**: Clients can create jobs at `/jobs/new`, view summaries in the dashboard, and check applicant lists per job.
+- **Applications**: Workers submit cover letters, track the status of their applications, and see recommended jobs on their dashboard view.
+- **Messaging**: Centralized inbox showing job-related conversations with the ability to reply when participants exist.
+- **Database Schema**: Supabase SQL script (`supabase/schema.sql`) defines enums, tables, indexes, and row-level security policies for all core entities.
+
+## Running Tests & Linting
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment Notes
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Set the same Supabase environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) in your hosting environment (e.g., Vercel).
+- Ensure RLS policies from `supabase/schema.sql` are applied before going live.
+- Stripe payments and advanced messaging (real-time) are left for Phase 1.5+ per the PRD.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Roadmap Suggestions
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Integrate Supabase Storage for profile avatars and document uploads.
+2. Add Stripe checkout flows for deposits and payouts.
+3. Build real-time messaging with Supabase Realtime and presence indicators.
+4. Layer in background verification workflows and subscription billing as noted in the PRD.
